@@ -1,4 +1,4 @@
-# TaskTracker
+# 📅 hab-bit - календарь полезных привычек⚡️
 <img src="screenshot.png" alt="screenshot" />
 
 ## Описание
