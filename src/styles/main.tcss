@@ -1,0 +1,47 @@
+.day_btn {
+    max-width: 10;
+    height: 4;
+    align: center middle;
+    text-style: bold;
+    border: none;
+
+    &.current {
+        background: aqua;
+        color: black;
+    }
+
+    &.completed {
+        background: green;
+    }
+
+    &.failed {
+        background: #9b2d30;
+    }
+
+    &.future {
+        background: #666;
+    }
+
+    &.another {
+        background: #333;
+    }
+}
+
+Horizontal {
+    height: auto;
+}
+
+.weekday {
+    width: 10;
+    text-align: center;
+    border: solid white;
+}
+
+.title {
+    text-style: bold;
+    margin-left: 5;
+}
+
+.task_checkbox {
+    width: 100%;
+}
