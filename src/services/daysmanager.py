@@ -86,7 +86,9 @@ class DaysManager:
             self._define_tasks_for_day(day)
 
         # Преобразуем массив месяца в массив недель и возвращаем
-        return [day_list[week*7-7:week*7] for week in range(1, 7)]
+        # return [day_list[week*7-7:week*7] for week in range(1, 7)]
+
+        return day_list
 
     def is_day_completed(self, day: Day) -> bool:
         '''Проверка, что все задачи дня выполнены.'''

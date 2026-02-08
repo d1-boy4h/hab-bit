@@ -1,5 +1,6 @@
+from textual.app import ComposeResult
 from textual.widget import Widget
-from textual.containers import Horizontal
+from textual.containers import Grid
 from textual.widgets import Static, Button
 
 class CalendarWidget(Widget):
@@ -10,35 +11,34 @@ class CalendarWidget(Widget):
 
         super().__init__()
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
         yield Static(id='calendar-title', classes='title')
 
         days_of_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-        with Horizontal():
+        with Grid(classes='weekdays'):
             for weekday in days_of_week:
                 yield Static(weekday, classes='weekday')
+        
+        yield Grid(id=f'calendar', classes='calendar')
 
-        for index in range(len(self._days_manager.calendar)):
-            yield Horizontal(id=f'week-container-{index}')
-
-    def on_mount(self):
-        self.build()
+        # for index in range(len(self._days_manager.calendar)):
+        #     yield Horizontal(id=f'week-container-{index}')
 
     def build(self):
         '''Рендер виджета.'''
         title = self.query_one('#calendar-title')
         title.update(f'Текущий месяц: {self._get_month_word(self._days_manager.month)}')
-        
-        for index, week in enumerate(self._days_manager.calendar):
-            week_container = self.query_one(f'#week-container-{index}')
-            week_container.remove_children()
 
-            for day in week:
-                week_container.mount(Button(
-                    str(day.date.day),
-                    id=f'day-{str(day.date)}-{self._days_manager.get_id()}',
-                    classes=self._get_classes_for_day(day, self._days_manager.today)
-                ))
+        calendar_container = self.query_one('#calendar')
+        for day in self._days_manager.calendar:
+            calendar_container.mount(Button(
+                str(day.date.day),
+                id=f'day-{str(day.date)}-{self._days_manager.get_id()}',
+                classes=self._get_classes_for_day(day, self._days_manager.today)
+            ))
+
+    def on_mount(self):
+        self.build()
 
     def _get_classes_for_day(self, day, today):
         base_class = 'day_btn'

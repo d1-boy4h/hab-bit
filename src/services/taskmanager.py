@@ -10,6 +10,7 @@ class TaskManager:
     def create_task(self, name):
         '''Создание задачи.'''
         while True:
+            # TODO: Переделать генерацию id через uuid
             new_id = str(randint(1000, 9999))
 
             for task in self._tasks:

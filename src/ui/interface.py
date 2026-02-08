@@ -23,7 +23,7 @@ class Interface(App):
             with Vertical():
                 tasks_widget = TasksWidget(
                     self._task_manager,
-                    self._days_manager,
+                    self._days_manager
                 )
 
                 calendar_widget = CalendarWidget(

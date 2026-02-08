@@ -1,3 +1,4 @@
+from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.widgets import Static, Checkbox, Input
 from textual.containers import Vertical
@@ -13,12 +14,11 @@ class TasksWidget(Widget):
     @property
     def _selected_day(self):
         '''Возвращает объект дня из кликнутого дня на календаре.'''
-        for week in self._days_manager.calendar:
-            for day in week:
-                if day.date == self._days_manager.selected_date:
-                    return day
+        for day in self._days_manager.calendar:
+            if day.date == self._days_manager.selected_date:
+                return day
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
         yield Static('', id='tasks-title', classes='title')
         yield Vertical(id='tasks-container')
         yield Input(id='tasks-input')
@@ -63,7 +63,7 @@ class TasksWidget(Widget):
         self._days_manager.update_day(self._selected_day, task_id)
 
     def on_input_submitted(self, event: Input.Submitted):
-        if event.input.id != 'tasks-input':
+        if not event.input.id.startswith('tasks-input'):
             return
 
         self._task_manager.create_task(event.value)
