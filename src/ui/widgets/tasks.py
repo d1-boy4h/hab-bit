@@ -59,7 +59,8 @@ class TasksWidget(Widget):
         ]
 
     def on_checkbox_changed(self, event: Checkbox.Changed):
-        task_id = event.checkbox.id.split('-')[1]
+        task_id_decompose = event.checkbox.id.split('-')
+        task_id = '-'.join(task_id_decompose[1:-1])
         self._days_manager.update_day(self._selected_day, task_id)
 
     def on_input_submitted(self, event: Input.Submitted):

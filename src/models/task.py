@@ -3,7 +3,7 @@ from datetime import date as Date
 class Task:
     '''Класс задачи (её id, имени и даты).'''
     def __init__(self, id, name='', date=None):
-        self._id = id
+        self._id = str(id)
         self._name = name
         self._date = Date.fromisoformat(date) if date else Date.today()
 

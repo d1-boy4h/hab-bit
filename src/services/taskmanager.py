@@ -1,5 +1,5 @@
-from random import randint
 from ..models import Task
+import uuid
 
 class TaskManager:
     '''Менеджер управления задачами (CRUD).'''
@@ -9,19 +9,11 @@ class TaskManager:
 
     def create_task(self, name):
         '''Создание задачи.'''
-        while True:
-            # TODO: Переделать генерацию id через uuid
-            new_id = str(randint(1000, 9999))
+        new_task = Task(uuid.uuid4(), name)
+        self._tasks.append(new_task)
+        self._storage.dump_tasks(self._tasks)
 
-            for task in self._tasks:
-                if new_id == task.id:
-                    continue
-
-            new_task = Task(new_id, name)
-            self._tasks.append(new_task)
-            self._storage.dump_tasks(self._tasks)
-
-            return new_task
+        return new_task
 
     def get_task(self, id):
         '''Получение задачи.'''
