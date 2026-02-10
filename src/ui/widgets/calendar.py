@@ -30,6 +30,7 @@ class CalendarWidget(Widget):
         title.update(f'Текущий месяц: {self._get_month_word(self._days_manager.month)}')
 
         calendar_container = self.query_one('#calendar')
+        calendar_container.remove_children()
         for day in self._days_manager.calendar:
             calendar_container.mount(Button(
                 str(day.date.day),
@@ -45,7 +46,7 @@ class CalendarWidget(Widget):
 
         additional_class = ''
         if day.date == today:
-            additional_class = 'current'
+            additional_class = 'today'
         elif day.date.month != today.month:
             additional_class = 'another'
         elif day.date > today:
@@ -54,6 +55,9 @@ class CalendarWidget(Widget):
             additional_class = 'completed'
         else:
             additional_class = 'failed'
+
+        if day.date == self._days_manager.selected_date:
+            additional_class = additional_class + ' ' + 'selected'
 
         return f'{base_class} {additional_class}'
 
@@ -83,4 +87,5 @@ class CalendarWidget(Widget):
     def on_button_pressed(self, event: Button.Pressed):
         date_str = event.button.id.partition('-')[-1].rpartition('-')[0]
         self._days_manager.change_selected_date(date_str)
+        self.build()
         self._tasks_widget_ref.build()

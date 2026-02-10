@@ -31,9 +31,13 @@ Horizontal {
     text-style: bold;
     border: none;
 
-    &.current {
+    &.today {
         background: aqua;
         color: black;
+    }
+
+    &.today.selected {
+        border: ascii black;
     }
 
     &.completed {
@@ -50,6 +54,10 @@ Horizontal {
 
     &.another {
         background: #333;
+    }
+
+    &.selected {
+        border: ascii white;
     }
 }
 
