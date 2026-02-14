@@ -9,7 +9,7 @@ class TaskManager:
 
     def create_task(self, name):
         '''Создание задачи.'''
-        new_task = Task(uuid.uuid4(), name)
+        new_task = Task(str(uuid.uuid4()), name)
         self._tasks.append(new_task)
         self._storage.dump_tasks(self._tasks)
 

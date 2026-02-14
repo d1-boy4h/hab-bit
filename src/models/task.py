@@ -2,8 +2,8 @@ from datetime import date as Date
 
 class Task:
     '''Класс задачи (её id, имени и даты).'''
-    def __init__(self, id, name='', date=None):
-        self._id = str(id)
+    def __init__(self, task_id, name='', date=None):
+        self._id = task_id
         self._name = name
         self._date = Date.fromisoformat(date) if date else Date.today()
 
@@ -25,7 +25,7 @@ class Task:
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'task_id': self.id,
             'name': self.name,
             'date': str(self.date)
         }
