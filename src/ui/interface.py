@@ -3,7 +3,7 @@ from textual.widgets import Header, Footer
 from textual.containers import Horizontal, Vertical
 
 from .widgets import CalendarWidget, TasksWidget
-from ..constants import PROGRAM_NAME, PROGRAM_VERSION
+from ..constants import PROGRAM_NAME, PROGRAM_DESCRIPTION
 
 class Interface(App):
     '''Интерфейс (TUI).'''
@@ -14,7 +14,7 @@ class Interface(App):
         self._days_manager = days_manager
 
         super().__init__()
-        self.title = f'{PROGRAM_NAME} [v{PROGRAM_VERSION}]'
+        self.title = f'{PROGRAM_NAME} - {PROGRAM_DESCRIPTION}'
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
