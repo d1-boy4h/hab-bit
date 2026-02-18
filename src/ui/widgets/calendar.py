@@ -18,11 +18,8 @@ class CalendarWidget(Widget):
         with Grid(classes='weekdays'):
             for weekday in days_of_week:
                 yield Static(weekday, classes='weekday')
-        
-        yield Grid(id=f'calendar', classes='calendar')
 
-        # for index in range(len(self._days_manager.calendar)):
-        #     yield Horizontal(id=f'week-container-{index}')
+        yield Grid(id='calendar', classes='calendar')
 
     def build(self):
         '''Рендер виджета.'''
@@ -31,6 +28,7 @@ class CalendarWidget(Widget):
 
         calendar_container = self.query_one('#calendar')
         calendar_container.remove_children()
+
         for day in self._days_manager.calendar:
             calendar_container.mount(Button(
                 str(day.date.day),

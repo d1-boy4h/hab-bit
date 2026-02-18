@@ -37,7 +37,7 @@ Horizontal {
     }
 
     &.today.selected {
-        border: ascii black;
+        border: solid black;
     }
 
     &.completed {
@@ -57,7 +57,7 @@ Horizontal {
     }
 
     &.selected {
-        border: ascii white;
+        border: solid white;
     }
 }
 
