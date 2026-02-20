@@ -43,7 +43,7 @@ class TasksWidget(Widget):
         for task in tasks:
             container.mount(Checkbox(
                 task.name,
-                value=self._selected_day.task_list[task.id],
+                value=self._selected_day.tasks[task.id],
                 id=f'task-{task.id}-{self._days_manager.get_id()}',
                 classes='task_checkbox',
                 disabled=not is_today
@@ -55,7 +55,7 @@ class TasksWidget(Widget):
     def _get_tasks_for_day(self, day):
         '''Возвращает задачи определённого дня.'''
         return [self._task_manager.get_task(task_id)
-            for task_id in day.task_list.keys()
+            for task_id in day.tasks.keys()
         ]
 
     def on_checkbox_changed(self, event: Checkbox.Changed):
@@ -68,5 +68,6 @@ class TasksWidget(Widget):
             return
 
         self._task_manager.create_task(event.value)
+        self._days_manager.update_calendar()
         event.control.clear()
         self.build()

@@ -2,23 +2,24 @@ from datetime import date as Date
 
 class Day:
     '''Класс дня с датой и списком выполненных задач.'''
-    def __init__(self, date, task_list=None):
-        if isinstance(date, Date):
-            self._date = date
-        elif isinstance(date, str):
+    def __init__(self, date, tasks=None):
+        if isinstance(date, str):
             self._date = Date.fromisoformat(date)
-        self._task_list = task_list if task_list else {}
+        else:
+            self._date = date
+
+        self._tasks = tasks if tasks else {}
 
     @property
     def date(self):
         return self._date
 
     @property
-    def task_list(self):
-        return self._task_list
+    def tasks(self):
+        return self._tasks
 
     def to_dict(self):
         return {
             'date': str(self.date),
-            'task_list': self.task_list
+            'tasks': self.tasks
         }

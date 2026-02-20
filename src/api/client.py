@@ -2,7 +2,7 @@ import json
 from os import sep
 from ..models import Day, Task
 
-class Storage:
+class Client:
     '''Класс для работы с JSON - сохранение и загрузка данных.'''
     def __init__(
         self,
@@ -24,7 +24,7 @@ class Storage:
         except FileNotFoundError:
             # TODO: Вставить тут логер с предупреждением
             # raise Warning(f'{filename}: файл не найден')
-            return []
+            return list()
 
         return [fetching_class(**elem) for elem in data]
 

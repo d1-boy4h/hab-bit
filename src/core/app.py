@@ -1,15 +1,15 @@
 from ..ui import Interface
-from ..stores import Storage
+from ..api import Client
 from ..services import TaskManager, DaysManager
 
 class App:
     '''Ядро программы.'''
     def __init__(self):
-        self._storage = Storage()
+        self._client = Client()
 
     def run(self):
-        task_manager = TaskManager(self._storage)
-        days_manager = DaysManager(self._storage, task_manager.tasks)
+        task_manager = TaskManager(self._client)
+        days_manager = DaysManager(self._client, task_manager.tasks)
 
         interface = Interface(task_manager, days_manager)
         interface.run()
