@@ -7,9 +7,11 @@ Horizontal {
     padding-left: 5;
 }
 
-.calendar {
-    grid-size: 7 6;
+.weekdays {
+    grid-size: 7;
     grid-columns: 1fr;
+    grid-rows: 1fr;
+    height: 3;
 }
 
 .weekday {
@@ -17,11 +19,9 @@ Horizontal {
     border: solid white;
 }
 
-.weekdays {
-    grid-size: 7;
+.calendar {
+    grid-size: 7 6;
     grid-columns: 1fr;
-    grid-rows: 1fr;
-    height: 3;
 }
 
 .day_btn {
@@ -34,10 +34,6 @@ Horizontal {
     &.today {
         background: aqua;
         color: black;
-    }
-
-    &.today.selected {
-        border: solid black;
     }
 
     &.completed {
@@ -57,7 +53,7 @@ Horizontal {
     }
 
     &.selected {
-        border: solid white;
+        tint: aqua 20%;
     }
 }
 
