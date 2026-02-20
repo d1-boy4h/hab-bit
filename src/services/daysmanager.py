@@ -1,5 +1,5 @@
 from datetime import datetime, date, timedelta
-from ..models import Day
+from ..models import Day, Task
 
 class DaysManager:
     '''Менеджер управления днями, календарём и датами.'''
@@ -10,10 +10,13 @@ class DaysManager:
         self._days_storage = self._client.fetch_days()
 
         self.selected_date = self.today
-        self.month = self.selected_date.month
-        self.year = self.selected_date.year
+        self.selected_month = self.today.month
+        self.selected_year = self.today.year
 
-        self.calendar = self.get_calendar(self.month, self.year)
+        self.calendar = self.get_calendar(
+            self.selected_month,
+            self.selected_year
+        )
 
     @property
     def today(self) -> date:
@@ -24,46 +27,40 @@ class DaysManager:
         '''Получение timestamp для уникальных id.'''
         return str(int(datetime.timestamp(datetime.today()) * 10))
 
-    def _is_day_saved(self, day) -> bool:
-        '''Проверка, что день сохранён.'''
-        for day in self._days_storage:
-            if day.date == day.date:
-                return True
+    def get_new_day(self, date: date) -> Day:
+        return Day(date)
 
-        return False
+    def get_day(self, date: date) -> Day | None:
+        '''Получение дня по дате из БД.'''
+        for saved_day in self._days_storage:
+            if date == saved_day.date:
+                return saved_day
 
-    def update_day(self, day, task_id):
-        '''Изменяет статус задачи выбранного дня.'''
+    def update_task_status_for_day(self, task_id: str):
+        '''Изменяет статус задачи выбранного дня и сохраняет в БД.'''
         if self.selected_date != self.today:
             return
 
-        day.tasks[task_id] = not day.tasks[task_id]
+        day = self.get_day(self.selected_date)
 
-        if self.is_any_task_completed(day):
-            if not self._is_day_saved(day):
-                self._days_storage.append(day)
+        if day:
+            if task_id in day.completed_tasks:
+                day.completed_tasks.remove(task_id)
+            else:
+                day.completed_tasks.append(task_id)
+
+            if not day.completed_tasks:
+                self._days_storage.remove(day)
+                
         else:
-            self.delete_day(day)
+            new_day = Day(self.selected_date)
+            self._days_storage.append(new_day)
+            new_day.completed_tasks.append(task_id)
 
         self._client.dump_days(self._days_storage)
 
-    def delete_day(self, day: Day):
-        '''Удаляет день.'''
-        for index, d in enumerate(self._days_storage):
-            if d.date == day.date:
-                del self._days_storage[index]
-
-    def _define_tasks_for_day(self, day: Day) -> None:
-        '''Перебор задач и выдача их дню.'''
-        for task in self._task_list:
-            # if task.id in day.tasks:
-            #     continue
-
-            if day.date >= task.date:
-                day.tasks[task.id] = False
-
-    def get_calendar(self, month: int, year: int) -> list[Day]:
-        '''Возвращает массив дней (класс Day) текущего месяца.'''
+    def get_calendar(self, month: int, year: int) -> list[date]:
+        '''Возвращает массив дней в виде дат текущего месяца.'''
         first_day = date(year, month, 1)
         weekday = first_day.weekday()
 
@@ -71,39 +68,25 @@ class DaysManager:
             first_day -= timedelta(days=weekday)
 
         # Получаем массив дней месяца
-        day_list = [Day(first_day + timedelta(days=d)) for d in range(0, 42)]
+        return [first_day + timedelta(days=d) for d in range(0, 42)]
 
-        # Подгружаем существующие дни и заменяем ими дни календаря,
-        # попутно распределяя задачи
-        for day_index, day in enumerate(day_list):
-            self._define_tasks_for_day(day)
-            for saved_day in self._days_storage:
-                if day.date == saved_day.date:
-                    day_list[day_index] = saved_day
+    def get_tasks_for_day(self, date: date) -> list[Task]:
+        '''Возвращает задачи определённого дня.'''
+        return [task for task in self._task_list if task.date <= date]
 
-        # Преобразуем массив месяца в массив недель и возвращаем
-        # return [day_list[week*7-7:week*7] for week in range(1, 7)]
-
-        return day_list
-
-    def update_calendar(self):
-        self.calendar = self.get_calendar(self.month, self.year)
-
-    def is_day_completed(self, day: Day) -> bool:
+    def is_day_completed(self, date: date) -> bool:
         '''Проверка, что все задачи дня выполнены.'''
-        return all(day.tasks.values())
+        tasks = self.get_tasks_for_day(date)
+        if not len(tasks):
+            return True
 
-    def is_any_task_completed(self, day: Day) -> bool:
-        '''Проверка, что хотя-бы одна задача дня выполнена.'''
-        return any(day.tasks.values())
+        day = self.get_day(date)
+        if day:
+            return len(tasks) == len(day.completed_tasks)
 
-    def is_selected_date_is_today(self) -> bool:
-        '''Проверка, что выбранный день являяется сегодняшним.'''
-        return self.selected_date == self.today
-
-    def change_selected_date(self, string_date: str):
+    def change_selected_date(self, str_date: str):
         '''Смена выбранного дня.'''
-        date_obj = date.fromisoformat(string_date)
+        new_date = date.fromisoformat(str_date)
 
-        if self.selected_date != date_obj:
-            self.selected_date = date_obj
+        if self.selected_date != new_date:
+            self.selected_date = new_date

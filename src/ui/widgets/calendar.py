@@ -24,37 +24,39 @@ class CalendarWidget(Widget):
     def build(self):
         '''Рендер виджета.'''
         title = self.query_one('#calendar-title')
-        title.update(f'Текущий месяц: {self._get_month_word(self._days_manager.month)}')
+        title.update(f'Текущий месяц: {self._get_month_word(
+            self._days_manager.selected_month
+        )}')
 
         calendar_container = self.query_one('#calendar')
         calendar_container.remove_children()
 
-        for day in self._days_manager.calendar:
+        for date in self._days_manager.calendar:
             calendar_container.mount(Button(
-                str(day.date.day),
-                id=f'day-{str(day.date)}-{self._days_manager.get_id()}',
-                classes=self._get_classes_for_day(day, self._days_manager.today)
+                str(date.day),
+                id=f'day-{str(date)}-{self._days_manager.get_id()}',
+                classes=self._get_classes_for_day(date, self._days_manager.today)
             ))
 
     def on_mount(self):
         self.build()
 
-    def _get_classes_for_day(self, day, today):
+    def _get_classes_for_day(self, date, today):
         base_class = 'day_btn'
 
         additional_class = ''
-        if day.date == today:
+        if date == today:
             additional_class = 'today'
-        elif day.date.month != today.month:
+        elif date.month != today.month:
             additional_class = 'another'
-        elif day.date > today:
+        elif date > today:
             additional_class = 'future'
-        elif self._days_manager.is_day_completed(day):
+        elif self._days_manager.is_day_completed(date):
             additional_class = 'completed'
         else:
             additional_class = 'failed'
 
-        if day.date == self._days_manager.selected_date:
+        if date == self._days_manager.selected_date:
             additional_class = additional_class + ' ' + 'selected'
 
         return f'{base_class} {additional_class}'

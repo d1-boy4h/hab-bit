@@ -11,12 +11,12 @@ class TasksWidget(Widget):
 
         super().__init__()
 
-    @property
-    def _selected_day(self):
-        '''Возвращает объект дня из кликнутого дня на календаре.'''
-        for day in self._days_manager.calendar:
-            if day.date == self._days_manager.selected_date:
-                return day
+    # @property
+    # def _selected_day(self):
+    #     '''Возвращает дату кликнутого дня на календаре.'''
+    #     for day_date in self._days_manager.calendar:
+    #         if day_date == self._days_manager.selected_date:
+    #             return day_date
 
     def compose(self) -> ComposeResult:
         yield Static('', id='tasks-title', classes='title')
@@ -29,21 +29,29 @@ class TasksWidget(Widget):
     def build(self):
         '''Рендер виджета.'''
         title = self.query_one('#tasks-title')
-        title.update(f'Список задач на {self._selected_day.date.day} число:')
+        title.update(f'Список задач на {self._days_manager.selected_date.day} число:')
 
         container = self.query_one('#tasks-container')
         container.remove_children()
 
-        tasks = self._get_tasks_for_day(self._selected_day)
+        selected_date = self._days_manager.selected_date
+        selected_day = self._days_manager.get_day(
+            selected_date
+        ) or self._days_manager.get_new_day(selected_date)
+
+        tasks = self._days_manager.get_tasks_for_day(
+            self._days_manager.selected_date
+        )
 
         if not len(tasks):
             container.mount(Static('Задач на это число не запланировано.'))
 
-        is_today = self._days_manager.is_selected_date_is_today()
+        is_today = self._days_manager.selected_date == self._days_manager.today
+
         for task in tasks:
             container.mount(Checkbox(
                 task.name,
-                value=self._selected_day.tasks[task.id],
+                value=task.id in selected_day.completed_tasks,
                 id=f'task-{task.id}-{self._days_manager.get_id()}',
                 classes='task_checkbox',
                 disabled=not is_today
@@ -52,22 +60,16 @@ class TasksWidget(Widget):
         tasks_input = self.query_one('#tasks-input')
         tasks_input.disabled = not is_today
 
-    def _get_tasks_for_day(self, day):
-        '''Возвращает задачи определённого дня.'''
-        return [self._task_manager.get_task(task_id)
-            for task_id in day.tasks.keys()
-        ]
-
     def on_checkbox_changed(self, event: Checkbox.Changed):
         task_id_decompose = event.checkbox.id.split('-')
         task_id = '-'.join(task_id_decompose[1:-1])
-        self._days_manager.update_day(self._selected_day, task_id)
+
+        self._days_manager.update_task_status_for_day(task_id)
 
     def on_input_submitted(self, event: Input.Submitted):
         if not event.input.id.startswith('tasks-input'):
             return
 
         self._task_manager.create_task(event.value)
-        self._days_manager.update_calendar()
         event.control.clear()
         self.build()
