@@ -77,7 +77,7 @@ class DaysManager:
     def is_day_completed(self, date: date) -> bool:
         '''Проверка, что все задачи дня выполнены.'''
         tasks = self.get_tasks_for_day(date)
-        if not len(tasks):
+        if not tasks:
             return True
 
         day = self.get_day(date)

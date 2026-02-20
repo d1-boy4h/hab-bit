@@ -43,7 +43,7 @@ class TasksWidget(Widget):
             self._days_manager.selected_date
         )
 
-        if not len(tasks):
+        if not tasks:
             container.mount(Static('Задач на это число не запланировано.'))
 
         is_today = self._days_manager.selected_date == self._days_manager.today
