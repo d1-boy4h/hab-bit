@@ -2,7 +2,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual.containers import Horizontal, Vertical
 
-from .widgets import CalendarWidget, TasksWidget
+from .widgets import CalendarWidget, TaskListWidget
 from ..constants import PROGRAM_NAME, PROGRAM_DESCRIPTION
 
 class Interface(App):
@@ -21,7 +21,7 @@ class Interface(App):
 
         with Horizontal():
             with Vertical():
-                tasks_widget = TasksWidget(
+                tasks_widget = TaskListWidget(
                     self._task_manager,
                     self._days_manager
                 )

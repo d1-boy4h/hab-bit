@@ -3,7 +3,7 @@ from textual.widget import Widget
 from textual.widgets import Static, Checkbox, Input
 from textual.containers import Vertical
 
-class TasksWidget(Widget):
+class TaskListWidget(Widget):
     '''Виджет списка задач.'''
     def __init__(self, task_manager, days_manager):
         self._task_manager = task_manager
