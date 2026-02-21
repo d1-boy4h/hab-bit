@@ -11,13 +11,6 @@ class TaskListWidget(Widget):
 
         super().__init__()
 
-    # @property
-    # def _selected_day(self):
-    #     '''Возвращает дату кликнутого дня на календаре.'''
-    #     for day_date in self._days_manager.calendar:
-    #         if day_date == self._days_manager.selected_date:
-    #             return day_date
-
     def compose(self) -> ComposeResult:
         yield Static('', id='tasks-title', classes='title')
         yield Vertical(id='tasks-container')
