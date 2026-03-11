@@ -24,11 +24,11 @@ class TasksRepository:
         data = self._db.read_table(self._table_name)
         return [self._to_model(item) for item in data]
 
-    def create(self, name: str) -> Task:
+    def create(self, date: Date, name: str) -> Task:
         '''Создаёт новую задачу.'''
         tasks = self.fetch_all()
 
-        new_task = Task(str(uuid.uuid4()), name)
+        new_task = Task(str(uuid.uuid4()), name, date=str(date))
         tasks.append(new_task)
 
         data = [self._from_model(task) for task in tasks]

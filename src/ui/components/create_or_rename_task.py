@@ -17,7 +17,8 @@ class CreateOrRenameTask:
 
         if self._router.current_route == Navigation.CREATE_TASK:
             task_name = self._console.input('Введите название задачи: ')
-            self._api_client.create_task(task_name)
+            date = self._store.selected_date
+            self._api_client.create_task(date, task_name)
 
         elif self._router.current_route == Navigation.RENAME_TASK:
             task_name = self._console.input('Введите новое название задачи: ')

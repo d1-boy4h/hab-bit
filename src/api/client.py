@@ -17,9 +17,9 @@ class ApiClient:
         '''Получить все задачи.'''
         return self._tasks_repo.fetch_all()
 
-    def create_task(self, name: str) -> Task:
+    def create_task(self, date: Date, name: str) -> Task:
         '''Создать задачу.'''
-        return self._tasks_repo.create(name)
+        return self._tasks_repo.create(date, name)
 
     def get_task(self, task_id: str) -> Task:
         '''Получить задачу по ID.'''
