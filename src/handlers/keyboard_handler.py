@@ -76,9 +76,11 @@ class KeyboardHandler:
 
             elif selected == TaskListActions.CREATE:
                 self.router.navigate(Navigation.CREATE_TASK)
+                self.store.tasklist_selected_action = TaskListActions.BACK
 
             elif selected == TaskListActions.CREATE_SINGLE:
                 self.router.navigate(Navigation.CREATE_SINGLE_TASK)
+                self.store.tasklist_selected_action = TaskListActions.BACK
 
             else:
                 self.store.selected_task_id = selected
@@ -123,3 +125,5 @@ class KeyboardHandler:
                 self.api_client.delete_task(self.store.selected_task_id)
                 self.store.tasklist_selected_action = TaskListActions.BACK
                 self.router.navigate(Navigation.TASK_LIST)
+
+            self.store.tasklist_selected_action = TaskListActions.BACK

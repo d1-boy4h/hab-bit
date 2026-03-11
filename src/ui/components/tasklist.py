@@ -10,6 +10,9 @@ class TaskList:
         self._store = store
         self._router = router
 
+        self._day = None
+        self._tasks = None
+
     def _get_style_for_action(
             self,
             action: str,
@@ -37,18 +40,37 @@ class TaskList:
         return f'{strike_style} {color_style}'
 
     def _get_margin(self):
+        '''Добавление отступа между списком задач и действиями.'''
         if self._router.current_route == Navigation.TASK_LIST:
             self._console.print()
+
+    def _get_data(self):
+        self._day = self._api_client.get_day(self._store.selected_date)
+        self._tasks = self._api_client.get_tasks_for_day(
+            self._store.selected_date
+        )
+
+    def _print_title(self):
+        '''Отрисовка заголовка'''
+        if len(self._tasks) == len(self._day.completed_tasks) and self._tasks and self._day.completed_tasks:
+            self._console.print(
+                f'Все задачи на {self._store.selected_date.day} число выполены!\nМожете отдохнуть',
+                style='bold green'
+            )
+            return
+            
+        self._console.print(
+            f'Список задач на {self._store.selected_date.day} число',
+            style='bold blue'
+        )
 
     def render(self):
         '''Отрисовка компонента списка задач.'''
         if self._router.current_route == Navigation.EDIT_TASK:
             return
 
-        self._console.print(
-            f'Список задач на {self._store.selected_date.day} число',
-            style='bold blue'
-        )
+        self._get_data()
+        self._print_title()
 
         # Действие назад
         if self._store.selected_date >= Date.today() and \
@@ -61,12 +83,12 @@ class TaskList:
         # Отрисовка задач
         self._get_margin()
 
-        tasks = self._api_client.get_tasks_for_day(self._store.selected_date)
-        day = self._api_client.get_day(self._store.selected_date)
-
-        if tasks:
-            for index, task in enumerate(tasks):
-                selected_task_style = self._get_style_for_action(task.id, day)
+        if self._tasks:
+            for index, task in enumerate(self._tasks):
+                selected_task_style = self._get_style_for_action(
+                    task.id,
+                    self._day
+                )
 
                 task_name = task.name
                 if task.type_id == TaskType.EVERYDAY:
