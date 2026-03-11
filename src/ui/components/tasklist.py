@@ -1,5 +1,6 @@
 from datetime import date as Date
 from ...constants import Navigation, TaskListActions
+from ...models import Day
 
 class TaskList:
     '''Компонента списка задач.'''
@@ -9,26 +10,40 @@ class TaskList:
         self._store = store
         self._router = router
 
-        self._title_style = 'bold blue'
-
-    def _get_style_for_action(self, action: str) -> str:
+    def _get_style_for_action(
+            self,
+            action: str,
+            day: Day = None
+        ) -> str:
         '''Возвращает стилизацию для элемента списка задач.'''
-        style = 'black on white'
+        color_style = ''
+        strike_style = ''
 
-        if self._router.current_route == Navigation.CALENDAR and \
-            self._store.selected_date < Date.today():
-            return 'grey46'
+        if day:
+            task_id = action
+            if task_id in day.completed_tasks:
+                if self._store.selected_date < Date.today():
+                    color_style = 'green'
+                else:
+                    color_style = 'green'
+                    strike_style = 'strike'
+            else:
+                if self._store.selected_date < Date.today():
+                    color_style = 'grey46'
 
         if action == self._store.tasklist_selected_action:
-            return style
+            color_style = 'black on white'
 
-        return ''
+        return f'{strike_style} {color_style}'
 
     def render(self):
         '''Отрисовка компонента списка задач.'''
+        if self._router.current_route == Navigation.EDIT_TASK:
+            return
+
         self._console.print(
             f'Список задач на {self._store.selected_date.day} число',
-            style=self._title_style
+            style='bold blue'
         )
 
         # Действие назад
@@ -41,10 +56,11 @@ class TaskList:
 
         # Отрисовка задач
         tasks = self._api_client.get_tasks_for_day(self._store.selected_date)
+        day = self._api_client.get_day(self._store.selected_date)
 
         if tasks:
             for index, task in enumerate(tasks):
-                selected_task_style = self._get_style_for_action(task.id)
+                selected_task_style = self._get_style_for_action(task.id, day)
                 self._console.print(
                     f'{index + 1}. {task.name}',
                     style=selected_task_style

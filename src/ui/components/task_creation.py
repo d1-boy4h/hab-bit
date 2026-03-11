@@ -9,7 +9,7 @@ class TaskCreation:
 
     def render(self):
         '''Отрисовка компонента создания задачи.'''
-        if self._router.current_route != Navigation.TASK_CREATION:
+        if self._router.current_route != Navigation.CREATE_TASK:
             return
         
         task_name = self._console.input('Введите название задачи: ')

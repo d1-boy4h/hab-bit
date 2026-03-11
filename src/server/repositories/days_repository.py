@@ -23,13 +23,15 @@ class DaysRepository:
         data = self._db.read_table(self._table_name)
         return [self._to_model(item) for item in data]
 
-    def get_by_date(self, date: Date) -> Optional[Day]:
+    def get_by_date(self, date: Date) -> Day:
         '''Возвращает день по дате'''
         days = self.fetch_all()
 
         for day in days:
             if day.date == date:
                 return day
+        
+        return Day(date)
 
     def save(self, day: Day):
         '''Сохраняет или обновляет день.'''

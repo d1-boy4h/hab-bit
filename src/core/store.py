@@ -6,4 +6,5 @@ class Store:
     def __init__(self):
         self.selected_date: Date = Date.today()
         self.tasklist_selected_action: Optional[str] = None
-        # self.selected_task_id: Optional[str] = None
+        self.selected_task_id: Optional[str] = None
+        self.edit_task_selected_action: Optional[str] = None

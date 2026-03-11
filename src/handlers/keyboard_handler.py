@@ -2,7 +2,7 @@ from typing import Any
 import readchar
 from datetime import date as Date, timedelta
 
-from ..constants import Navigation, TaskListActions
+from ..constants import Navigation, TaskListActions, EditTaskActions
 
 class KeyboardHandler:
     '''Обработчик клавиатурного ввода.'''
@@ -13,7 +13,7 @@ class KeyboardHandler:
 
     def handle(self, key: str):
         '''Обработка нажатия клавиши.'''
-        if key == 'q':
+        if key in ['q', 'й']:
             # Вызов self._exit() через ошибку
             raise KeyboardInterrupt
 
@@ -21,6 +21,8 @@ class KeyboardHandler:
             self._handle_calendar(key)
         elif self.router.current_route == Navigation.TASK_LIST:
             self._handle_task_list(key)
+        elif self.router.current_route == Navigation.EDIT_TASK:
+            self._handle_edit_task(key)
 
     def _handle_calendar(self, key: str):
         '''Обработка клавиш в режиме календаря.'''
@@ -70,4 +72,40 @@ class KeyboardHandler:
                 self.router.navigate(Navigation.CALENDAR)
 
             elif selected == TaskListActions.CREATE:
-                self.router.navigate(Navigation.TASK_CREATION)
+                self.router.navigate(Navigation.CREATE_TASK)
+
+            else:
+                self.store.selected_task_id = selected
+                self.router.navigate(Navigation.EDIT_TASK)
+                self.store.edit_task_selected_action = EditTaskActions.SWITCH
+
+    def _handle_edit_task(self, key: str):
+        '''Обработка клавиш в режиме редактирования задачи.'''
+        actions = [
+            EditTaskActions.SWITCH,
+            # EditTaskActions.RENAME,
+            # EditTaskActions.DELETE,
+            EditTaskActions.BACK
+        ]
+        current_index = actions.index(self.store.edit_task_selected_action)
+
+        if key == readchar.key.DOWN:
+            new_index = (current_index + 1) % len(actions)
+            self.store.edit_task_selected_action = actions[new_index]
+
+        elif key == readchar.key.UP:
+            new_index = (current_index - 1) % len(actions)
+            self.store.edit_task_selected_action = actions[new_index]
+
+        if key == readchar.key.ENTER:
+            selected = self.store.edit_task_selected_action
+
+            if selected == EditTaskActions.BACK:
+                self.router.navigate(Navigation.TASK_LIST)
+
+            elif selected == EditTaskActions.SWITCH:
+                self.api_client.update_task_status(
+                    self.store.selected_date,
+                    self.store.selected_task_id
+                )
+                self.router.navigate(Navigation.TASK_LIST)

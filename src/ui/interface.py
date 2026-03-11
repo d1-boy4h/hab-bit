@@ -2,7 +2,7 @@ from rich.console import Console
 from rich.theme import Theme
 import readchar
 
-from .components import Header, Calendar, TaskList, TaskCreation
+from .components import Header, Calendar, TaskList, TaskCreation, EditTask
 
 class Interface():
     '''Интерфейс (TUI).'''
@@ -35,6 +35,12 @@ class Interface():
             self._api_client,
             self._router
         )
+        self._edit_task = EditTask(
+            self._console,
+            self._api_client,
+            self._store,
+            self._router
+        )
 
         # Условие работы главного цикла программы
         self._running = True
@@ -44,11 +50,14 @@ class Interface():
         while self._running:
             self._header.render()
 
-            self._console.print()
+            self._console.print('[grey46]Для выхода нажмите \'q\'[/]')
             self._calendar.render()
 
             self._console.print()
             self._tasklist.render()
+
+            self._console.print()
+            self._edit_task.render()
 
             key = readchar.readkey()
             self._keyboard_handler.handle(key)
