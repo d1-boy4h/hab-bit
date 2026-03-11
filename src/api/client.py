@@ -33,6 +33,16 @@ class ApiClient:
         '''Получить все задачи за день.'''
         return self._tasks_repo.get_for_day(date)
 
+    def delete_task(self, task_id: str) -> Optional[Task]:
+        task = self._tasks_repo.delete(task_id)
+
+        days = self.get_all_days()
+        for day in days:
+            if task.id in day.completed_tasks:
+                self.update_task_status(day.date, task.id)
+
+        return task
+
     # Методы для работы с днями
 
     def get_all_days(self) -> List[Day]:

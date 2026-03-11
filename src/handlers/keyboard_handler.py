@@ -84,7 +84,7 @@ class KeyboardHandler:
         actions = [
             EditTaskActions.SWITCH,
             EditTaskActions.RENAME,
-            # EditTaskActions.DELETE,
+            EditTaskActions.DELETE,
             EditTaskActions.BACK
         ]
         current_index = actions.index(self.store.edit_task_selected_action)
@@ -112,3 +112,8 @@ class KeyboardHandler:
 
             elif selected == EditTaskActions.RENAME:
                 self.router.navigate(Navigation.RENAME_TASK)
+
+            elif selected == EditTaskActions.DELETE:
+                self.api_client.delete_task(self.store.selected_task_id)
+                self.store.tasklist_selected_action = TaskListActions.BACK
+                self.router.navigate(Navigation.TASK_LIST)
