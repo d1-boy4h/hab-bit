@@ -2,7 +2,8 @@ from rich.console import Console
 from rich.theme import Theme
 import readchar
 
-from .components import Header, Calendar, TaskList, TaskCreation, EditTask
+from .components import \
+    Header, Calendar, TaskList, CreateOrRenameTask, EditTask
 
 class Interface():
     '''Интерфейс (TUI).'''
@@ -30,9 +31,10 @@ class Interface():
             self._store,
             self._router
         )
-        self._task_creation = TaskCreation(
+        self._create_or_rename_task = CreateOrRenameTask(
             self._console,
             self._api_client,
+            self._store,
             self._router
         )
         self._edit_task = EditTask(
@@ -55,15 +57,13 @@ class Interface():
 
             self._console.print()
             self._tasklist.render()
-
-            self._console.print()
             self._edit_task.render()
 
             key = readchar.readkey()
             self._keyboard_handler.handle(key)
 
             self._console.print()
-            self._task_creation.render()
+            self._create_or_rename_task.render()
 
             self._console.clear()
 

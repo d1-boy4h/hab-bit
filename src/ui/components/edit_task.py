@@ -11,7 +11,7 @@ class EditTask:
 
         self._actions =  [
             EditTaskActions.SWITCH,
-            # EditTaskActions.RENAME,
+            EditTaskActions.RENAME,
             # EditTaskActions.DELETE,
             EditTaskActions.BACK
         ]

@@ -83,7 +83,7 @@ class KeyboardHandler:
         '''Обработка клавиш в режиме редактирования задачи.'''
         actions = [
             EditTaskActions.SWITCH,
-            # EditTaskActions.RENAME,
+            EditTaskActions.RENAME,
             # EditTaskActions.DELETE,
             EditTaskActions.BACK
         ]
@@ -109,3 +109,6 @@ class KeyboardHandler:
                     self.store.selected_task_id
                 )
                 self.router.navigate(Navigation.TASK_LIST)
+
+            elif selected == EditTaskActions.RENAME:
+                self.router.navigate(Navigation.RENAME_TASK)
