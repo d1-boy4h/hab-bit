@@ -1,17 +1,22 @@
-from ..models import Task
 import uuid
+from datetime import date as Date
+
+from ..models import Task
 
 class TaskManager:
     '''Менеджер управления задачами (CRUD).'''
-    def __init__(self, storage):
-        self._storage = storage
-        self._tasks = storage.fetch_tasks()
+    def __init__(self, client):
+        self._client = client
+        self._tasks = client.fetch_tasks()
 
     def create_task(self, name):
         '''Создание задачи.'''
+        name = name.strip()
+        if not name:
+            name = '[без названия]'
         new_task = Task(str(uuid.uuid4()), name)
         self._tasks.append(new_task)
-        self._storage.dump_tasks(self._tasks)
+        self._client.dump_tasks(self._tasks)
 
         return new_task
 
@@ -36,7 +41,7 @@ class TaskManager:
                 continue
 
             del self._tasks[index]
-            self._storage.dump_tasks(self._tasks)
+            self._client.dump_tasks(self._tasks)
 
             return task
 
@@ -44,3 +49,7 @@ class TaskManager:
     def tasks(self):
         '''Получение всех задач.'''
         return self._tasks
+
+    def get_tasks_for_day(self, date: Date) -> list[Task]:
+        '''Возвращает задачи определённого дня.'''
+        return [task for task in self.tasks if task.date <= date]

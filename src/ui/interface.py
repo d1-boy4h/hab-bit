@@ -1,38 +1,48 @@
-from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer
-from textual.containers import Horizontal, Vertical
+from rich.console import Console
+from rich.theme import Theme
 
-from .widgets import CalendarWidget, TaskListWidget
-from ..constants import PROGRAM_NAME, PROGRAM_DESCRIPTION
+from .components import Header, Calendar, TaskList
 
-class Interface(App):
+class Interface():
     '''Интерфейс (TUI).'''
-    CSS_PATH = '../styles/main.tcss'
+    def __init__(self, storage):
+        self._storage = storage
 
-    def __init__(self, task_manager, days_manager):
-        self._task_manager = task_manager
-        self._days_manager = days_manager
+        # Отмена тем, чтобы правильно работали стили
+        custom_theme = Theme(inherit=False)
+        self._console = Console(theme=custom_theme)
 
-        super().__init__()
-        self.title = f'{PROGRAM_NAME} - {PROGRAM_DESCRIPTION}'
+        # Инициализация компонентов
+        self._header = Header(self._console)
+        self._calendar = Calendar(self._console, self._storage)
+        self._tasklist = TaskList(self._console, self._storage)
 
-    def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
+        # Условие работы главного цикла программы
+        self._running = True
 
-        with Horizontal():
-            with Vertical():
-                tasks_widget = TaskListWidget(
-                    self._task_manager,
-                    self._days_manager
-                )
+    def _render(self):
+        '''Главная функция отрисовки интерфейса.'''
+        while self._running:
+            self._header.render()
 
-                calendar_widget = CalendarWidget(
-                    self._days_manager,
-                    tasks_widget
-                )
+            self._console.print()
+            self._calendar.render()
 
-                yield calendar_widget
-            with Vertical():
-                yield tasks_widget
+            self._console.print()
+            self._tasklist.render()
 
-        yield Footer()
+            self._storage.key_handler()
+            self._console.clear()
+
+    def run(self):
+        '''Запуск интерфейса программы.'''
+        try:
+            with self._console.screen():
+                self._render()
+        except KeyboardInterrupt:
+            self._exit()
+
+    def _exit(self):
+        '''Выход из программы.'''
+        self._running = False
+        self._console.print('[white on blue bold]До свидания![/]')
