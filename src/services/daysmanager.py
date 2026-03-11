@@ -1,31 +1,11 @@
-from datetime import datetime, date, timedelta
+from datetime import date
 from ..models import Day, Task
 
 class DaysManager:
     '''Менеджер управления днями, календарём и датами.'''
-    def __init__(self, client, task_list):
+    def __init__(self, client):
         self._client = client
-        self._task_list = task_list
-
         self._days_storage = self._client.fetch_days()
-
-        self.selected_date = self.today
-        self.selected_month = self.today.month
-        self.selected_year = self.today.year
-
-        self.calendar = self.get_calendar(
-            self.selected_month,
-            self.selected_year
-        )
-
-    @property
-    def today(self) -> date:
-        '''Возвращает сегодняшнюю дату.'''
-        return date.today()
-
-    def get_id(self) -> float:
-        '''Получение timestamp для уникальных id.'''
-        return str(int(datetime.timestamp(datetime.today()) * 10))
 
     def get_new_day(self, date: date) -> Day:
         return Day(date)
@@ -58,35 +38,3 @@ class DaysManager:
             new_day.completed_tasks.append(task_id)
 
         self._client.dump_days(self._days_storage)
-
-    def get_calendar(self, month: int, year: int) -> list[date]:
-        '''Возвращает массив дней в виде дат текущего месяца.'''
-        first_day = date(year, month, 1)
-        weekday = first_day.weekday()
-
-        if weekday:
-            first_day -= timedelta(days=weekday)
-
-        # Получаем массив дней месяца
-        return [first_day + timedelta(days=d) for d in range(0, 42)]
-
-    def get_tasks_for_day(self, date: date) -> list[Task]:
-        '''Возвращает задачи определённого дня.'''
-        return [task for task in self._task_list if task.date <= date]
-
-    def is_day_completed(self, date: date) -> bool:
-        '''Проверка, что все задачи дня выполнены.'''
-        tasks = self.get_tasks_for_day(date)
-        if not tasks:
-            return True
-
-        day = self.get_day(date)
-        if day:
-            return len(tasks) == len(day.completed_tasks)
-
-    def change_selected_date(self, str_date: str):
-        '''Смена выбранного дня.'''
-        new_date = date.fromisoformat(str_date)
-
-        if self.selected_date != new_date:
-            self.selected_date = new_date

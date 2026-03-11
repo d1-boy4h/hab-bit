@@ -1,6 +1,6 @@
 from ..ui import Interface
 from ..api import Client
-from ..services import TaskManager, DaysManager
+from ..services import TaskManager, DaysManager, Storage
 
 class App:
     '''Ядро программы.'''
@@ -9,7 +9,9 @@ class App:
 
     def run(self):
         task_manager = TaskManager(self._client)
-        days_manager = DaysManager(self._client, task_manager.tasks)
+        days_manager = DaysManager(self._client)
 
-        interface = Interface(task_manager, days_manager)
+        storage = Storage(task_manager, days_manager)
+        interface = Interface(storage)
+
         interface.run()

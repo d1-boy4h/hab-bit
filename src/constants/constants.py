@@ -1,4 +1,0 @@
-'''Константы и кофиги.'''
-
-PROGRAM_NAME = '📅 hab-bit'
-PROGRAM_DESCRIPTION = 'календарь полезных привычек ⚡️'
