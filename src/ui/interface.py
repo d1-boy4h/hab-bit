@@ -1,12 +1,16 @@
 from rich.console import Console
 from rich.theme import Theme
+import readchar
 
-from .components import Header, Calendar, TaskList
+from .components import Header, Calendar, TaskList, TaskCreation
 
 class Interface():
     '''Интерфейс (TUI).'''
-    def __init__(self, storage):
-        self._storage = storage
+    def __init__(self, api_client, store, router, keyboard_handler):
+        self._api_client = api_client
+        self._store = store
+        self._router = router
+        self._keyboard_handler = keyboard_handler
 
         # Отмена тем, чтобы правильно работали стили
         custom_theme = Theme(inherit=False)
@@ -14,8 +18,23 @@ class Interface():
 
         # Инициализация компонентов
         self._header = Header(self._console)
-        self._calendar = Calendar(self._console, self._storage)
-        self._tasklist = TaskList(self._console, self._storage)
+        self._calendar = Calendar(
+            self._console,
+            self._api_client,
+            self._store,
+            self._router
+        )
+        self._tasklist = TaskList(
+            self._console,
+            self._api_client,
+            self._store,
+            self._router
+        )
+        self._task_creation = TaskCreation(
+            self._console,
+            self._api_client,
+            self._router
+        )
 
         # Условие работы главного цикла программы
         self._running = True
@@ -31,7 +50,12 @@ class Interface():
             self._console.print()
             self._tasklist.render()
 
-            self._storage.key_handler()
+            key = readchar.readkey()
+            self._keyboard_handler.handle(key)
+
+            self._console.print()
+            self._task_creation.render()
+
             self._console.clear()
 
     def run(self):

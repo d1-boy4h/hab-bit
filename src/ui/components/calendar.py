@@ -2,13 +2,15 @@ from datetime import date as Date, timedelta
 
 class Calendar:
     '''Компонент календаря.'''
-    def __init__(self, console, storage):
+    def __init__(self, console, api_client, store, router):
         self._console = console
-        self._storage = storage
+        self._api_client = api_client
+        self._store = store
+        self._router = router
 
     @property
     def _calendar(self):
-        return self._get_calendar(self._storage.selected_date)
+        return self._get_calendar(self._store.selected_date)
 
     def _get_calendar(self, current_date: Date) -> list[Date]:
         '''Возвращает массив дней в виде дат текущего месяца.'''
@@ -27,28 +29,17 @@ class Calendar:
         '''Возвращает текущий месяц в виде слова.'''
         month_list = [
             'Месяц не определён!',
-            'Январь',
-            'Февраль',
-            'Март',
-            'Апрель',
-            'Май',
-            'Июнь',
-            'Июль',
-            'Август',
-            'Сентябрь',
-            'Октябрь',
-            'Ноябрь',
-            'Декабрь'
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
         ]
 
-        if month > 0 or month <= 12:
+        if 1 <= month <= 12:
             return month_list[month]
-        else:
-            return month_list[0]
+        return month_list[0]
 
     def _render_month_title(self):
         '''Отрисовка текущего месяца.'''
-        selected_date = self._storage.selected_date
+        selected_date = self._store.selected_date
         current_month_word = self._get_month_word(selected_date.month)
         self._console.print(f'Текущий месяц: [bold]{current_month_word}[/]')
 
@@ -65,7 +56,17 @@ class Calendar:
         '''Добавляет пробел перед числом, если оно однозначное.'''
         return f' {day}' if day < 10 else str(day)
 
-    def _get_style_for_day(self, date: Date, today: Date):
+    def _is_day_completed(self, date: Date) -> bool:
+        '''Проверка, что все задачи дня выполнены.'''
+        tasks = self._api_client.get_tasks_for_day(date)
+
+        if not tasks:
+            return True
+
+        day = self._api_client.get_day(date)
+        return len(tasks) == len(day.completed_tasks)
+
+    def _get_style_for_day(self, date: Date, today: Date) -> str:
         '''Возвращает стилизацию для календарного дня.'''
         background = ''
         text = ''
@@ -83,7 +84,7 @@ class Calendar:
             # Дни, которые ещё не настали
             text = 'white'
             background = 'on grey42'
-        elif self._storage.is_day_completed(date):
+        elif self._is_day_completed(date):
             # Полностью выполненный день
             text = 'white'
             background = 'on dark_sea_green4'
@@ -92,7 +93,7 @@ class Calendar:
             text = 'white'
             background = 'on red3'
 
-        if date == self._storage.selected_date:
+        if date == self._store.selected_date:
             selected = 'u bold'
 
         return f'{selected} {text} {background}'

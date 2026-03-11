@@ -1,57 +1,56 @@
-import json
-from os import sep
-from ..models import Day, Task
+from typing import List, Optional
+from datetime import date as Date
 
-class Client:
-    '''Класс для работы с JSON - сохранение и загрузка данных.'''
-    def __init__(
-        self,
-        logger=None,
-        data_folder='data',
-        tasks_filename='tasks_data.json',
-        days_filename='days_data.json'
-    ):
-        self._tasks_data_filename = data_folder + sep + tasks_filename
-        self._days_data_filename = data_folder + sep + days_filename
+from ..models import Task, Day
+from ..server import Database, TasksRepository, DaysRepository
 
-        self._logger = logger # TODO: Реализовать логгер
+class ApiClient:
+    '''Клиент для работы с сервером.'''
+    def __init__(self):
+        self._db = Database()
+        self._tasks_repo = TasksRepository(self._db)
+        self._days_repo = DaysRepository(self._db)
 
-    def _fetch(self, filename, fetching_class):
-        '''Загрузка данных их JSON.'''
-        try:
-            with open(filename, 'r', encoding='utf-8') as json_file:
-                data = json.load(json_file)
-        except FileNotFoundError:
-            # TODO: Вставить тут логер с предупреждением
-            # raise Warning(f'{filename}: файл не найден')
-            return list()
+    # Методы для работы с задачами
 
-        return [fetching_class(**elem) for elem in data]
+    def get_all_tasks(self) -> List[Task]:
+        '''Получить все задачи.'''
+        return self._tasks_repo.fetch_all()
 
-    def fetch_tasks(self):
-        '''Загрузка задач из JSON.'''
-        return self._fetch(self._tasks_data_filename, Task)
+    def create_task(self, name: str) -> Task:
+        '''Создать задачу.'''
+        return self._tasks_repo.create(name)
 
-    def fetch_days(self):
-        '''Загрузка дней из JSON.'''
-        return self._fetch(self._days_data_filename, Day)
+    def get_task(self, task_id: str) -> Task:
+        '''Получить задачу по ID.'''
+        return self._tasks_repo.get_by_id(task_id)
 
-    def _dump(self, filename, data_list):
-        '''Сохранение данных в JSON.'''
-        dump_data = [elem.to_dict() for elem in data_list]
+    def update_task(self, task_id: str, new_name: str) -> Optional[Task]:
+        '''Обновить задачу.'''
+        return self._tasks_repo.update(task_id, new_name)
 
-        try:
-            with open(filename, 'w', encoding='utf-8') as json_file:
-                json.dump(dump_data, json_file, ensure_ascii=False, indent=2)
-        except json.JSONDecodeError:
-            # TODO: Вставить тут логер с ошибкой
-            # raise Error(f'{filename}: файл не найден')
-            pass
+    def get_tasks_for_day(self, date: Date) -> List[Task]:
+        '''Получить все задачи за день.'''
+        return self._tasks_repo.get_for_day(date)
 
-    def dump_tasks(self, tasks):
-        '''Сохранение задач в JSON.'''
-        return self._dump(self._tasks_data_filename, tasks)
+    # Методы для работы с днями
 
-    def dump_days(self, days):
-        '''Сохранение дней в JSON.'''
-        return self._dump(self._days_data_filename, days)
+    def get_all_days(self) -> List[Day]:
+        '''Получить все дни.'''
+        return self._days_repo.fetch_all()
+
+    def get_day(self, date: Date) -> Optional[Day]:
+        '''Получить день по дате.'''
+        return self._days_repo.get_by_date(date)
+
+    def save_day(self, day: Day):
+        '''Сохранить день.'''
+        return self._days_repo.save(day)
+
+    def delete_day(self, date: Date) -> Optional[Day]:
+        '''Удалить день.'''
+        return self._days_repo.delete(date)
+
+    def update_task_status(self, date: Date, task_id: str):
+        '''Обновить статус задачи.'''
+        return self._days_repo.update_task_status(date, task_id)
