@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import Optional
 from datetime import date as Date
 import uuid
 
 from ...models import Task
 from .. import Database
+from ...constants import TaskType
 
 class TasksRepository:
     '''Репозиторий задач.'''
@@ -19,16 +20,16 @@ class TasksRepository:
         '''Преобразовазует задачу в словарь для JSON.'''
         return task.to_dict()
 
-    def fetch_all(self) -> List[Task]:
+    def fetch_all(self) -> list[Task]:
         '''Возвращает все задачи.'''
         data = self._db.read_table(self._table_name)
         return [self._to_model(item) for item in data]
 
-    def create(self, date: Date, name: str) -> Task:
+    def create(self, date: Date, name: str, type_id: str) -> Task:
         '''Создаёт новую задачу.'''
         tasks = self.fetch_all()
 
-        new_task = Task(str(uuid.uuid4()), name, date=str(date))
+        new_task = Task(str(uuid.uuid4()), name, date, type_id)
         tasks.append(new_task)
 
         data = [self._from_model(task) for task in tasks]
@@ -69,7 +70,15 @@ class TasksRepository:
 
                 return deleted
 
-    def get_for_day(self, date: Date) -> List[Task]:
+    def get_for_day(self, date: Date) -> list[Task]:
         '''Вощвращает список задач за определённый день.'''
         tasks = self.fetch_all()
-        return [task for task in tasks if task.date <= date]
+
+        tasks_for_day = []
+        for task in tasks:
+            if task.type_id == TaskType.EVERYDAY and task.date <= date:
+                tasks_for_day.append(task)
+            elif task.type_id == TaskType.SINGLE and task.date == date:
+                tasks_for_day.append(task)
+
+        return tasks_for_day

@@ -48,7 +48,10 @@ class KeyboardHandler:
             actions.append(task.id)
 
         if self.store.selected_date >= Date.today():
-            actions.append(TaskListActions.CREATE)
+            actions.extend([
+                TaskListActions.CREATE_SINGLE,
+                TaskListActions.CREATE
+            ])
 
         return actions
 
@@ -73,6 +76,9 @@ class KeyboardHandler:
 
             elif selected == TaskListActions.CREATE:
                 self.router.navigate(Navigation.CREATE_TASK)
+
+            elif selected == TaskListActions.CREATE_SINGLE:
+                self.router.navigate(Navigation.CREATE_SINGLE_TASK)
 
             else:
                 self.store.selected_task_id = selected

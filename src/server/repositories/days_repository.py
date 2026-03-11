@@ -65,9 +65,6 @@ class DaysRepository:
         '''Обновляет статус задачи в конкретный день.'''
         day = self.get_by_date(date)
 
-        if not day:
-            day = Day(date)
-
         if task_id not in day.completed_tasks:
             day.completed_tasks.append(task_id)
         elif task_id in day.completed_tasks:

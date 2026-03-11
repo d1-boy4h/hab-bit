@@ -4,3 +4,4 @@ class EditTaskActions:
     RENAME = 'rename'
     DELETE = 'delete'
     BACK = 'back'
+ 

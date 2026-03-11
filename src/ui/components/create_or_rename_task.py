@@ -1,4 +1,4 @@
-from ...constants import Navigation
+from ...constants import Navigation, TaskType
 
 class CreateOrRenameTask:
     '''Компонент создания задачи.'''
@@ -8,7 +8,11 @@ class CreateOrRenameTask:
         self._store = store
         self._router = router
 
-        self._valid_nav_list = [Navigation.CREATE_TASK, Navigation.RENAME_TASK]
+        self._valid_nav_list = [
+            Navigation.CREATE_TASK,
+            Navigation.CREATE_SINGLE_TASK,
+            Navigation.RENAME_TASK
+        ]
 
     def render(self):
         '''Отрисовка компонента создания задачи.'''
@@ -16,9 +20,14 @@ class CreateOrRenameTask:
             return
 
         if self._router.current_route == Navigation.CREATE_TASK:
+            task_name = self._console.input('Введите название привычки: ')
+            date = self._store.selected_date
+            self._api_client.create_task(date, task_name, TaskType.EVERYDAY)
+
+        elif self._router.current_route == Navigation.CREATE_SINGLE_TASK:
             task_name = self._console.input('Введите название задачи: ')
             date = self._store.selected_date
-            self._api_client.create_task(date, task_name)
+            self._api_client.create_task(date, task_name, TaskType.SINGLE)
 
         elif self._router.current_route == Navigation.RENAME_TASK:
             task_name = self._console.input('Введите новое название задачи: ')

@@ -1,5 +1,5 @@
 from datetime import date as Date
-from ...constants import Navigation, TaskListActions
+from ...constants import Navigation, TaskListActions, TaskType
 from ...models import Day
 
 class TaskList:
@@ -36,6 +36,10 @@ class TaskList:
 
         return f'{strike_style} {color_style}'
 
+    def _get_margin(self):
+        if self._router.current_route == Navigation.TASK_LIST:
+            self._console.print()
+
     def render(self):
         '''Отрисовка компонента списка задач.'''
         if self._router.current_route == Navigation.EDIT_TASK:
@@ -55,23 +59,36 @@ class TaskList:
             )
 
         # Отрисовка задач
+        self._get_margin()
+
         tasks = self._api_client.get_tasks_for_day(self._store.selected_date)
         day = self._api_client.get_day(self._store.selected_date)
 
         if tasks:
             for index, task in enumerate(tasks):
                 selected_task_style = self._get_style_for_action(task.id, day)
+
+                task_name = task.name
+                if task.type_id == TaskType.EVERYDAY:
+                    task_name = task.name + ' [привычка]'
+
                 self._console.print(
-                    f'{index + 1}. {task.name}',
+                    f'{index + 1}. {task_name}',
                     style=selected_task_style
                 )
-        elif self._router.current_route == Navigation.CALENDAR:
-            self._console.print('На этот день задач не найдено.')
+        else:
+            self._console.print('[grey46]На этот день задач не найдено.[/]')
 
-        # Добавление новой задачи
+        self._get_margin()
+
+        # Добавление новой задачи или привычки
         if self._store.selected_date >= Date.today() and \
             self._router.current_route != Navigation.CALENDAR:
             self._console.print(
-                '- Создать новую -',
+                '- Создать задачу -',
+                style=self._get_style_for_action(TaskListActions.CREATE_SINGLE)
+            )
+            self._console.print(
+                '- Создать привычку -',
                 style=self._get_style_for_action(TaskListActions.CREATE)
             )
