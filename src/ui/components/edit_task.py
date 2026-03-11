@@ -18,8 +18,13 @@ class EditTask:
 
     def _get_action_word(self, action: str) -> Optional[str]:
         '''Возвращает действие в виде слова.'''
+        switch_str = 'Выполнить'
+        day = self._api_client.get_day(self._store.selected_date)
+        if self._store.selected_task_id in day.completed_tasks:
+            switch_str = 'Отменить выполнение'
+
         actions_word_list = {
-            EditTaskActions.SWITCH: 'Отметить как выполненное/не выполненное',
+            EditTaskActions.SWITCH: switch_str,
             EditTaskActions.RENAME: 'Переименовать',
             EditTaskActions.DELETE: 'Удалить',
             EditTaskActions.BACK: 'Назад'
