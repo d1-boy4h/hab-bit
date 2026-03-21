@@ -91,6 +91,7 @@ class KeyboardHandler:
         '''Обработка клавиш в режиме редактирования задачи.'''
         actions = [
             EditTaskActions.SWITCH,
+            EditTaskActions.MOVE,
             EditTaskActions.RENAME,
             EditTaskActions.DELETE,
             EditTaskActions.BACK
@@ -116,6 +117,19 @@ class KeyboardHandler:
                     self.store.selected_date,
                     self.store.selected_task_id
                 )
+                self.router.navigate(Navigation.TASK_LIST)
+
+            elif selected == EditTaskActions.MOVE:
+                task = self.api_client.delete_task(
+                    self.store.selected_task_id
+                )
+
+                self.api_client.create_task(
+                    task.date,
+                    task.name,
+                    task.type_id
+                )
+
                 self.router.navigate(Navigation.TASK_LIST)
 
             elif selected == EditTaskActions.RENAME:

@@ -11,6 +11,7 @@ class EditTask:
 
         self._actions =  [
             EditTaskActions.SWITCH,
+            EditTaskActions.MOVE,
             EditTaskActions.RENAME,
             EditTaskActions.DELETE,
             EditTaskActions.BACK
@@ -25,6 +26,7 @@ class EditTask:
 
         actions_word_list = {
             EditTaskActions.SWITCH: switch_str,
+            EditTaskActions.MOVE: 'Переместить в конец',
             EditTaskActions.RENAME: 'Переименовать',
             EditTaskActions.DELETE: 'Удалить',
             EditTaskActions.BACK: 'Назад'
