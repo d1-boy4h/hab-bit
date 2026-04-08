@@ -15,7 +15,6 @@ def run_command(cmd: list[str], desc: str) -> bool:
 
     return True
 
-
 def main():
     commands = [
         (['mypy', '.', '--ignore-missing-imports'], 'mypy проверка типов'),
